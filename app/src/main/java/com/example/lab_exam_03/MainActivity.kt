@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.DisplayMetrics
+import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.example.lab_exam_03.util.OnSwipeListener
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var uHandler:Handler
     private lateinit var scoreResult:TextView
     var score = 0
+    var interval = 100L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,10 +85,6 @@ class MainActivity : AppCompatActivity() {
         uHandler = Handler()
         startRepeat()
 
-    }
-
-    private fun startRepeat() {
-        TODO("Not yet implemented")
     }
 
     private fun planetInterChange() {
@@ -168,12 +166,67 @@ class MainActivity : AppCompatActivity() {
         for(i in 55 downTo 0){
             if (planet.get(i+noOfBlock).tag as Int == notPlanet){
 
-                planet.get(i+noOfBlock)
+                planet.get(i+noOfBlock).setImageResource(planet.get(i).tag as Int)
+                planet.get(i+noOfBlock).setTag(planet.get(i).tag as Int)
+
+                planet.get(i).setImageResource(notPlanet)
+                planet.get(i).setTag(notPlanet)
+                if(list.contains(i) && planet.get(i).tag == notPlanet){
+                    var randomColor : Int = Math.abs((Math.random() * planets.size).toInt())
+                    planet.get(i).setImageResource(planets[randomColor])
+                    planet.get(i).setTag(planets[randomColor])
+                }
+            }
+        }
+        for(i in 0..7){
+            if(planet.get(i).tag as Int == notPlanet){
+                var randomColor : Int = Math.abs((Math.random() * planets.size).toInt())
+                planet.get(i).setImageResource(planets[randomColor])
+                planet.get(i).setTag(planets[randomColor])
             }
         }
     }
+    val repeatChecker :Runnable = object : Runnable{
+        override fun run() {
+            try {
+                checkRowForThree()
+                checkColumnForThree()
+                moveDownPlanets()
+            }finally {
+                uHandler.postDelayed(this,interval)
+            }
+        }
+
+    }
+
+    private fun startRepeat() {
+        repeatChecker.run()
+    }
 
     private fun createBoard() {
-        TODO("Not yet implemented")
+        val gridLayout = findViewById<GridLayout>(R.id.board)
+        gridLayout.rowCount = noOfBlock
+        gridLayout.columnCount = noOfBlock
+        gridLayout.layoutParams.width = widthOfScreen
+        gridLayout.layoutParams.height = widthOfScreen
+
+        for (i in 0 until noOfBlock*noOfBlock){
+            val imageView = ImageView(this)
+            imageView.id = i
+            imageView.layoutParams = android.view.ViewGroup.LayoutParams(widthOfBlock,widthOfBlock)
+
+            imageView.maxHeight = widthOfBlock
+            imageView.maxWidth = widthOfBlock
+
+            var random : Int = Math.floor(Math.random() * planets.size).toInt()
+            //random index from planet array
+            imageView.setImageResource(planets[random])
+            imageView.setTag(planets[random])
+
+            planet.add(imageView)
+            gridLayout.addView(imageView)
+
+
+        }
     }
 }

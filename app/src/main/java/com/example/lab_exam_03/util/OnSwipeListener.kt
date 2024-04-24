@@ -27,7 +27,7 @@ open class OnSwipeListener(context:Context?):View.OnTouchListener {
             velocityY: Float
         ): Boolean {
             var result = false
-            val yDiff = e2.y -e1!!.y
+            val yDiff = e2.y - e1!!.y
             val xDiff = e2.x -e1.x
 
             if(Math.abs(xDiff)>Math.abs(yDiff)){
