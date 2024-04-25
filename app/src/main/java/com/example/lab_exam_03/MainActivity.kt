@@ -1,5 +1,7 @@
 package com.example.lab_exam_03
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -8,11 +10,16 @@ import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.example.lab_exam_03.util.OnSwipeListener
-import java.util.Arrays.asList
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    var planets = intArrayOf(
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
+    private val HIGH_SCORE_KEY = "high_score"
+    private val PLAYER_NAME_KEY = "player_name"
+
+    private val planets = intArrayOf(
         R.drawable.blueplanet,
         R.drawable.jupiterplanet,
         R.drawable.saturnplanet,
@@ -20,36 +27,57 @@ class MainActivity : AppCompatActivity() {
         R.drawable.purpleplanet
     )
 
-    var widthOfBlock : Int = 0
-    var noOfBlock :Int = 8
-    var widthOfScreen: Int = 0
-    lateinit var planet:ArrayList<ImageView>
-    var planetTobeDragged : Int =0
-    var planetTobeReplaced : Int = 0
-    var notPlanet : Int = R.drawable.transparent_drawable
-    lateinit var uHandler:Handler
-    private lateinit var scoreResult:TextView
-    var score = 0
-    var interval = 100L
+    private var widthOfBlock: Int = 0
+    private val noOfBlock: Int = 8
+    private var widthOfScreen: Int = 0
+    private lateinit var planet: ArrayList<ImageView>
+    private var planetTobeDragged: Int = 0
+    private var planetTobeReplaced: Int = 0
+    private val notPlanet: Int = R.drawable.transparent_drawable
+    private lateinit var uHandler: Handler
+    private lateinit var scoreResult: TextView
+    private var score = 0
+    private val interval = 100L
+
+    //shared preference usage
+    private var highestScore = 0
+    private var playerName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+
+        // Load highest score and player name from SharedPreferences
+        highestScore = sharedPreferences.getInt(HIGH_SCORE_KEY, 0)
+        playerName = sharedPreferences.getString(PLAYER_NAME_KEY, "") ?: ""
+
+        // Example of updating highest score and player name
+        if (score > highestScore) {
+            highestScore = score
+            playerName = "PlayerName" // Replace this with the actual player name
+            // Save highest score and player name to SharedPreferences
+            editor.putInt(HIGH_SCORE_KEY, highestScore)
+            editor.putString(PLAYER_NAME_KEY, playerName)
+            editor.apply()
+        }
+
+
         scoreResult = findViewById(R.id.score)
 
-        val dispalyMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(dispalyMetrics)
-        widthOfScreen = dispalyMetrics.widthPixels
-        var heightOfScreen = dispalyMetrics.heightPixels
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        widthOfScreen = displayMetrics.widthPixels
 
         widthOfBlock = widthOfScreen / noOfBlock
         planet = ArrayList()
         createBoard()
 
-        for(imageView in planet){
-
-            imageView.setOnTouchListener(object :OnSwipeListener(this){
+        for (imageView in planet) {
+            imageView.setOnTouchListener(object : OnSwipeListener(this) {
                 override fun onSwipeLeft() {
                     super.onSwipeLeft()
                     planetTobeDragged = imageView.id
@@ -76,127 +104,121 @@ class MainActivity : AppCompatActivity() {
                     planetTobeDragged = imageView.id
                     planetTobeReplaced = planetTobeDragged + noOfBlock
                     planetInterChange()
-
                 }
             })
-
         }
 
         uHandler = Handler()
         startRepeat()
-
     }
+
+
 
     private fun planetInterChange() {
+        val background: Int = planet[planetTobeReplaced].tag as Int
+        val background1: Int = planet[planetTobeDragged].tag as Int
 
-        var background : Int = planet.get(planetTobeReplaced).tag as Int
-        var background1 : Int = planet.get(planetTobeDragged).tag as Int
+        planet[planetTobeDragged].setImageResource(background)
+        planet[planetTobeReplaced].setImageResource(background1)
 
-        planet.get(planetTobeDragged).setImageResource(background)
-        planet.get(planetTobeReplaced).setImageResource(background1)
-
-        planet.get(planetTobeDragged).setTag(background)
-        planet.get(planetTobeReplaced).setTag(background1)
-
+        planet[planetTobeDragged].tag = background
+        planet[planetTobeReplaced].tag = background1
     }
 
-    private fun checkRowForThree(){
-        for(i in 0..61){
-            var chosedPlanet = planet.get(i).tag
-            var isBlank : Boolean = planet.get(i).tag == notPlanet
-            val notValid = arrayOf(6,7,14,15,22,23,30,31,38,39,46,47,54,55)
-            var list = asList(*notValid)
+    private fun checkRowForThree() {
+        for (i in 0..61) {
+            val chosenPlanet = planet[i].tag
+            val isBlank: Boolean = planet[i].tag == notPlanet
+            val notValid = arrayOf(6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55)
+            val list = notValid.toList()
 
-            if (!list.contains(i)){
+            if (!list.contains(i)) {
                 var x = i
 
-                if(planet.get(x++).tag as Int == chosedPlanet && !isBlank
-                    && planet.get(x++).tag as Int == chosedPlanet
-                    && planet.get(x).tag as Int == chosedPlanet){
-
-                    score = score + 3
+                if (planet[x++].tag as Int == chosenPlanet && !isBlank
+                    && planet[x++].tag as Int == chosenPlanet
+                    && planet[x].tag as Int == chosenPlanet
+                ) {
+                    score += 3
                     scoreResult.text = "$score"
-                    planet.get(x).setImageResource(notPlanet)
-                    planet.get(x).setTag(notPlanet)
+                    planet[x].setImageResource(notPlanet)
+                    planet[x].tag = notPlanet
                     x--
-                    planet.get(x).setImageResource(notPlanet)
-                    planet.get(x).setTag(notPlanet)
+                    planet[x].setImageResource(notPlanet)
+                    planet[x].tag = notPlanet
                     x--
-                    planet.get(x).setImageResource(notPlanet)
-                    planet.get(x).setTag(notPlanet)
-
+                    planet[x].setImageResource(notPlanet)
+                    planet[x].tag = notPlanet
                 }
             }
         }
         moveDownPlanets()
     }
-    private fun checkColumnForThree(){
-        for(i in 0..47){
-            var chosedPlanet = planet.get(i).tag
-            var isBlank : Boolean = planet.get(i).tag == notPlanet
 
+    private fun checkColumnForThree() {
+        for (i in 0..47) {
+            val chosenPlanet = planet[i].tag
+            val isBlank: Boolean = planet[i].tag == notPlanet
 
             var x = i
 
-                if(planet.get(x).tag as Int == chosedPlanet && !isBlank
-                    && planet.get(x+noOfBlock).tag as Int == chosedPlanet
-                    && planet.get(x+2*noOfBlock).tag as Int == chosedPlanet){
-
-                    score = score + 3
-                    scoreResult.text = "$score"
-                    planet.get(x).setImageResource(notPlanet)
-                    planet.get(x).setTag(notPlanet)
-                    x = x + noOfBlock
-                    planet.get(x).setImageResource(notPlanet)
-                    planet.get(x).setTag(notPlanet)
-                    x = x + noOfBlock
-                    planet.get(x).setImageResource(notPlanet)
-                    planet.get(x).setTag(notPlanet)
-
-                }
-
+            if (planet[x].tag as Int == chosenPlanet && !isBlank
+                && planet[x + noOfBlock].tag as Int == chosenPlanet
+                && planet[x + 2 * noOfBlock].tag as Int == chosenPlanet
+            ) {
+                score += 3
+                scoreResult.text = "$score"
+                planet[x].setImageResource(notPlanet)
+                planet[x].tag = notPlanet
+                x += noOfBlock
+                planet[x].setImageResource(notPlanet)
+                planet[x].tag = notPlanet
+                x += noOfBlock
+                planet[x].setImageResource(notPlanet)
+                planet[x].tag = notPlanet
+            }
         }
         moveDownPlanets()
     }
 
     private fun moveDownPlanets() {
+        val firstRow = intArrayOf(0, 1, 2, 3, 4, 5, 6, 7)
+        val list = firstRow.toList()
 
-        val firstRow = arrayOf(1,2,3,4,5,6,7)
-        val list = asList(*firstRow)
-        for(i in 55 downTo 0){
-            if (planet.get(i+noOfBlock).tag as Int == notPlanet){
+        for (i in 55 downTo 0) {
+            if (planet[i + noOfBlock].tag as Int == notPlanet) {
+                planet[i + noOfBlock].setImageResource(planet[i].tag as Int)
+                planet[i + noOfBlock].tag = planet[i].tag as Int
 
-                planet.get(i+noOfBlock).setImageResource(planet.get(i).tag as Int)
-                planet.get(i+noOfBlock).setTag(planet.get(i).tag as Int)
+                planet[i].setImageResource(notPlanet)
+                planet[i].tag = notPlanet
 
-                planet.get(i).setImageResource(notPlanet)
-                planet.get(i).setTag(notPlanet)
-                if(list.contains(i) && planet.get(i).tag == notPlanet){
-                    var randomColor : Int = Math.abs((Math.random() * planets.size).toInt())
-                    planet.get(i).setImageResource(planets[randomColor])
-                    planet.get(i).setTag(planets[randomColor])
+                if (list.contains(i) && planet[i].tag == notPlanet) {
+                    val randomColor: Int = Math.abs((Math.random() * planets.size).toInt())
+                    planet[i].setImageResource(planets[randomColor])
+                    planet[i].tag = planets[randomColor]
                 }
             }
         }
-        for(i in 0..7){
-            if(planet.get(i).tag as Int == notPlanet){
-                var randomColor : Int = Math.abs((Math.random() * planets.size).toInt())
-                planet.get(i).setImageResource(planets[randomColor])
-                planet.get(i).setTag(planets[randomColor])
+        for (i in 0..7) {
+            if (planet[i].tag as Int == notPlanet) {
+                val randomColor: Int = Math.abs((Math.random() * planets.size).toInt())
+                planet[i].setImageResource(planets[randomColor])
+                planet[i].tag = planets[randomColor]
             }
         }
     }
-    val repeatChecker :Runnable = object : Runnable{
+
+    private val repeatChecker: Runnable = object : Runnable {
         override fun run() {
             try {
                 checkRowForThree()
                 checkColumnForThree()
                 moveDownPlanets()
-            }finally {
-                uHandler.postDelayed(this,interval)
+            } finally {
+                uHandler.postDelayed(this, interval)
             }
         }
-
     }
 
     private fun startRepeat() {
@@ -210,23 +232,20 @@ class MainActivity : AppCompatActivity() {
         gridLayout.layoutParams.width = widthOfScreen
         gridLayout.layoutParams.height = widthOfScreen
 
-        for (i in 0 until noOfBlock*noOfBlock){
+        for (i in 0 until noOfBlock * noOfBlock) {
             val imageView = ImageView(this)
             imageView.id = i
-            imageView.layoutParams = android.view.ViewGroup.LayoutParams(widthOfBlock,widthOfBlock)
+            imageView.layoutParams = android.view.ViewGroup.LayoutParams(widthOfBlock, widthOfBlock)
 
             imageView.maxHeight = widthOfBlock
             imageView.maxWidth = widthOfBlock
 
-            var random : Int = Math.floor(Math.random() * planets.size).toInt()
-            //random index from planet array
+            val random: Int = (Math.random() * planets.size).toInt()
             imageView.setImageResource(planets[random])
-            imageView.setTag(planets[random])
+            imageView.tag = planets[random]
 
             planet.add(imageView)
             gridLayout.addView(imageView)
-
-
         }
     }
 }

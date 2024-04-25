@@ -46,5 +46,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
 //    gif image dependencies
-    implementation ("pl.droidsonroids.gif:android-gif-drawable:1.2.20")
+    // https://mvnrepository.com/artifact/pl.droidsonroids.gif/android-gif-drawable
+    implementation("pl.droidsonroids.gif:android-gif-drawable:1.2.28")
+
 }

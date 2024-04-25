@@ -5,17 +5,19 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 
-open class OnSwipeListener(context:Context?):View.OnTouchListener {
+open class OnSwipeListener(context: Context?) : View.OnTouchListener {
 
-    var gestureDelector:GestureDetector
+    private val gestureDetector: GestureDetector
 
     override fun onTouch(v: View?, motionEvent: MotionEvent?): Boolean {
-        return gestureDelector.onTouchEvent(motionEvent!!)
+        return motionEvent?.let { gestureDetector.onTouchEvent(it) } ?: false
     }
-    inner class GestureListener : GestureDetector.SimpleOnGestureListener(){
 
-        val SWIPE_THRESOLD = 100
-        val SWIPE_VELOCITY_THRESOLD = 100
+    inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
+
+        val SWIPE_THRESHOLD = 100
+        val SWIPE_VELOCITY_THRESHOLD = 100
+
         override fun onDown(e: MotionEvent): Boolean {
             return true
         }
@@ -28,31 +30,22 @@ open class OnSwipeListener(context:Context?):View.OnTouchListener {
         ): Boolean {
             var result = false
             val yDiff = e2.y - e1!!.y
-            val xDiff = e2.x -e1.x
+            val xDiff = e2.x - e1.x
 
-            if(Math.abs(xDiff)>Math.abs(yDiff)){
-                //means that we are either going to left or right direction and top to bottom direction
-                if(Math.abs(xDiff)>SWIPE_THRESOLD && Math.abs(velocityX)>SWIPE_VELOCITY_THRESOLD){
-                    if(xDiff > 0){
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                if (Math.abs(xDiff) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (xDiff > 0) {
                         onSwipeRight()
-                    }else{
+                    } else {
                         onSwipeLeft()
                     }
                     result = true
                 }
-//                else if(Math.abs(yDiff)>SWIPE_THRESOLD && Math.abs(velocityY)>SWIPE_VELOCITY_THRESOLD){
-//                    if(yDiff > 0){
-//                        onSwipeTop()
-//                    }else{
-//                        onSwipeBottom()
-//                    }
-//                    result = true
-//                }
-            }else if(Math.abs(yDiff)>SWIPE_THRESOLD && Math.abs(velocityY)>SWIPE_VELOCITY_THRESOLD){
-                if(yDiff > 0){
-                    onSwipeTop()
-                }else{
+            } else if (Math.abs(yDiff) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                if (yDiff > 0) {
                     onSwipeBottom()
+                } else {
+                    onSwipeTop()
                 }
                 result = true
             }
@@ -60,23 +53,15 @@ open class OnSwipeListener(context:Context?):View.OnTouchListener {
         }
     }
 
-    open fun onSwipeBottom() {
-        TODO("Not yet implemented")
-    }
+    open fun onSwipeBottom() {}
 
-    open fun onSwipeTop() {
-        TODO("Not yet implemented")
-    }
+    open fun onSwipeTop() {}
 
-    open fun onSwipeLeft() {
-        TODO("Not yet implemented")
-    }
+    open fun onSwipeLeft() {}
 
-    open fun onSwipeRight() {
-        TODO("Not yet implemented")
-    }
+    open fun onSwipeRight() {}
 
     init {
-        gestureDelector = GestureDetector(context,GestureListener())
+        gestureDetector = GestureDetector(context, GestureListener())
     }
 }
