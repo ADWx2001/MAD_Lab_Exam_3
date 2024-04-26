@@ -46,7 +46,7 @@ class HighScore : AppCompatActivity() {
             playerNameView.setTextColor(resources.getColor(R.color.white))
 
             val playerScoreView = TextView(this)
-            playerScoreView.text = "Score: $playerScore"
+            playerScoreView.text = getString(R.string.score_display_score_activity, playerScore)
             playerScoreView.setTextColor(resources.getColor(R.color.white))
 
             // Add the TextViews to the container
