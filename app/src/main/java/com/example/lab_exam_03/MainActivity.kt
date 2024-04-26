@@ -1,11 +1,14 @@
 package com.example.lab_exam_03
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.util.DisplayMetrics
+import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -55,16 +58,6 @@ class MainActivity : AppCompatActivity() {
         highestScore = sharedPreferences.getInt(HIGH_SCORE_KEY, 0)
         playerName = sharedPreferences.getString(PLAYER_NAME_KEY, "") ?: ""
 
-        // Example of updating highest score and player name
-        if (score > highestScore) {
-            highestScore = score
-            playerName = "PlayerName" // Replace this with the actual player name
-            // Save highest score and player name to SharedPreferences
-            editor.putInt(HIGH_SCORE_KEY, highestScore)
-            editor.putString(PLAYER_NAME_KEY, playerName)
-            editor.apply()
-        }
-
 
         scoreResult = findViewById(R.id.score)
 
@@ -110,8 +103,53 @@ class MainActivity : AppCompatActivity() {
 
         uHandler = Handler()
         startRepeat()
+
+        object : CountDownTimer(30000, 1000) { // 30 seconds
+            override fun onTick(millisUntilFinished: Long) {
+                // Do nothing, you can update UI if needed
+            }
+
+            override fun onFinish() {
+                // Display score
+                scoreResult.text = "Your score: $score"
+
+                // Prompt for player name if score > 0
+                if (score > 0) {
+                    showNameInputWindow()
+                }
+            }
+        }.start()
     }
 
+    private fun showNameInputWindow() {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.dialog_name_input, null)
+        dialogBuilder.setView(dialogView)
+
+        val editTextName = dialogView.findViewById<EditText>(R.id.editName)
+
+        dialogBuilder.setTitle("Enter Your Name")
+        dialogBuilder.setMessage("Enter your name to save your score:")
+        dialogBuilder.setPositiveButton("Save") { dialog, which ->
+            // Save name and score to SharedPreferences
+            val playerName = editTextName.text.toString()
+            savePlayerScore(playerName)
+        }
+        dialogBuilder.setNegativeButton("Cancel") { dialog, which ->
+            dialog.dismiss()
+        }
+
+        val alertDialog = dialogBuilder.create()
+        alertDialog.show()
+    }
+
+    private fun savePlayerScore(playerName: String) {
+        // Save highest score and player name to SharedPreferences
+        editor.putInt(HIGH_SCORE_KEY, score)
+        editor.putString(PLAYER_NAME_KEY, playerName)
+        editor.apply()
+    }
 
 
     private fun planetInterChange() {

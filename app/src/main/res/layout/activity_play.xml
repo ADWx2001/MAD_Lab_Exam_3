@@ -17,9 +17,23 @@
         android:layout_gravity="center"
 
         android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        android:layout_height="100dp"
+        android:contentDescription="@string/playbutton_image" />
 
-<!--        android:layout_width="wrap_content"-->
+    <Button
+        android:id="@+id/viewScoreBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/scores" />
+
+    <Button
+        android:id="@+id/extBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Exit" />
+
+    <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"/>-->
 
 </LinearLayout>

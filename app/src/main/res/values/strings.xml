@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Lab_Exam_03</string>
     <string name="score">Score -</string>
+    <string name="player_score">Your score:</string>
+    <string name="scores">Scores</string>
+    <string name="playbutton_image">playButton image</string>
+    <string name="player_name">Player Name: %1$s</string>
 </resources>
