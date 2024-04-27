@@ -6,4 +6,6 @@
     <string name="playbutton_image">playButton image</string>
     <string name="player_name">Player Name: %1$s</string>
     <string name="score_display_score_activity">Score: %1$s</string>
+    <string name="logo_welcome">logo_welcome</string>
+    <string name="exit">Exit</string>
 </resources>

@@ -7,33 +7,35 @@
     android:orientation="vertical"
     android:gravity="center"
     android:layout_gravity="center"
-    android:background="@drawable/main_page_1"
+    android:background="@color/black"
     tools:context=".view.PlayActivity">
 
-    <ImageView
-        android:id="@+id/playBtn"
-        android:src="@drawable/playbtn"
-        android:layout_marginTop="50dp"
-        android:layout_gravity="center"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/pngegg"
+        android:gravity="center">
 
+        <ImageView
+        android:id="@+id/playBtn"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:contentDescription="@string/playbutton_image" />
+        android:contentDescription="@string/playbutton_image"
+        android:src="@drawable/playbtn" />
 
-    <Button
-        android:id="@+id/viewScoreBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/scores" />
+        <Button
+            android:id="@+id/viewScoreBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"  android:text="@string/scores" />
 
-    <Button
-        android:id="@+id/extBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Exit" />
-
-    <!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"/>-->
+        <Button
+            android:id="@+id/extBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/exit" />
+    </LinearLayout>
 
 </LinearLayout>
